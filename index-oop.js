@@ -9,7 +9,8 @@ const search = {
         event.preventDefault();
         document.getElementById("error").innerHTML = ("")
         let inputText = document.getElementById("searchField");
-        this.userInput = inputText.value
+        let inputRegex = new RegExp(inputText.value, 'gi');
+        this.userInput = inputRegex
     },
     displayInputError: function() {
         return document.getElementById("error").innerHTML = (`Please enter a valid search term`)
@@ -20,6 +21,13 @@ const search = {
     },
     displayMatchError: function() {
         return document.getElementById("error").innerHTML = (`Your search did not return any result.`)
+    },
+    wordMatched: [],
+    recordWordMatched: function() {
+        this.wordMatched = [];
+        for(const match of this.matches) {
+            this.wordMatched.push(match[0])
+        }
     },
     wordStart: [],
     recordWordStart: function() {
@@ -35,9 +43,12 @@ const search = {
             this.wordEnd.push(match.index + match[0].length)
         }
     },
-    highlight: '',
+    highlight: [],
     highlightWord: function() {
-        this.highlight = this.userInput.replace(this.userInput, `<span class="match">` + this.userInput + `</span>`)
+        this.highlight = [];
+        this.highlight = this.wordMatched.map(word => {
+            return word.replace(word, `<span class="match">${word}</span>`)
+        })
     },
     preText: '',
     getPreText: function () {
@@ -56,15 +67,17 @@ const search = {
         let midCount = 0;
         this.postText = [];
         while (midCount < this.matches.length) {
-            this.postText.push(this.highlight + this.midText[midCount])
+            this.postText.push(this.highlight[midCount] + this.midText[midCount])
             midCount++
         }
     },
     renderText: function() {
+        document.getElementById("error").innerHTML = (`${this.matches.length} result(s) found.`)
         document.getElementsByTagName('article')[0].innerHTML =
         (this.preText + this.postText.join(""))
     },
     displayMatch: function() {
+        search.recordWordMatched()
         search.recordWordStart()
         search.recordWordEnd()
         search.highlightWord()
