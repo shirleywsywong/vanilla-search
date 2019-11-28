@@ -63,6 +63,15 @@ const search = {
     renderText: function() {
         document.getElementsByTagName('article')[0].innerHTML =
         (this.preText + this.postText.join(""))
+    },
+    displayMatch: function() {
+        search.recordWordStart()
+        search.recordWordEnd()
+        search.highlightWord()
+        search.getPreText()
+        search.getMidText()
+        search.assemblePostText()
+        search.renderText()
     }
 }
 
@@ -78,11 +87,5 @@ document
         if (search.matches.length === 0) {
             return search.displayMatchError()
         }
-        search.recordWordStart()
-        search.recordWordEnd()
-        search.highlightWord()
-        search.getPreText()
-        search.getMidText()
-        search.assemblePostText()
-        search.renderText()
+        search.displayMatch()
     }
