@@ -1,83 +1,88 @@
 const search = {
+    articleContent: "",
     getContent: function() {
-        return document.getElementsByTagName('article')[0].innerHTML
+        search.articleContent = document.getElementsByTagName('article')[0].innerHTML
+        //why does 'this' refers to the window here?
     },
-    getUserInput: function() {
-        document.getElementById("getSearchInput").onclick = function (event) {
-            event.preventDefault();
-            document.getElementById("error").innerHTML = ("")
-            let inputText = document.getElementById("searchField");
-            console.log(inputText.value)
-            return inputText.value;
+    userInput: "",
+    getUserInput: function(event) {
+        event.preventDefault();
+        document.getElementById("error").innerHTML = ("")
+        let inputText = document.getElementById("searchField");
+        this.userInput = inputText.value
+    },
+    displayInputError: function() {
+        return document.getElementById("error").innerHTML = (`Please enter a valid search term`)
+    },
+    matches: [],
+    findMatch: function() {
+        this.matches = [...this.articleContent.matchAll(this.userInput)]
+    },
+    displayMatchError: function() {
+        return document.getElementById("error").innerHTML = (`Your search did not return any result.`)
+    },
+    wordStart: [],
+    recordWordStart: function() {
+        this.wordStart = [];
+        for (const match of this.matches) {
+            this.wordStart.push(match.index)
         }
     },
-    checkUserInput: function() {
-        if (this.getUserInput === '') {
-            console.log('checkInput')
-            document.getElementById("error").innerHTML = (`Please enter a valid search term`)
+    wordEnd: [],
+    recordWordEnd: function() {
+        this.wordEnd = [];
+        for (const match of this.matches) {
+            this.wordEnd.push(match.index + match[0].length)
         }
     },
-    findMatch: function(input) {
-        let match = [...content.matchAll(input)]
+    highlight: '',
+    highlightWord: function() {
+        this.highlight = this.userInput.replace(this.userInput, `<span class="match">` + this.userInput + `</span>`)
     },
-    checkMatch: function(matches) {
-        if (matches.length == 0) {
-            return document.getElementById("error").innerHTML = (`Your search did not return any result.`)
+    preText: '',
+    getPreText: function () {
+        this.preText = '';
+        this.preText = this.articleContent.substring(0, this.wordStart[0])
+    },
+    midText: [],
+    getMidText: function () {
+        this.midText = [];
+        for (let i = 0; i < this.wordStart.length; i++) {
+            this.midText.push(this.articleContent.substring(this.wordEnd[i], this.wordStart[i + 1]))
         }
     },
-    recordMatch: function(matches) {
-        let word = matches[0][0];
-        let wordStart = [];
-        let wordEnd = [];
-
-        for (const match of matches) {
-            wordStart.push(match.index)
-            wordEnd.push(match.index + match[0].length)
+    postText: [],
+    assemblePostText: function() {
+        let midCount = 0;
+        this.postText = [];
+        while (midCount < this.matches.length) {
+            this.postText.push(this.highlight + this.midText[midCount])
+            midCount++
         }
-
-        highlightMatch(word, wordStart, wordEnd)
+    },
+    renderText: function() {
+        document.getElementsByTagName('article')[0].innerHTML =
+        (this.preText + this.postText.join(""))
     }
-
 }
 
-//get all the content in the article
-
-
-//get the search term from the input field
-
-
-//find the matching word in the content
-
-//check to see if there's any search result
-
-//record where the word is found
-
-
-//highlight the matched word in the text
-function highlightMatch(word, wordStart, wordEnd) {
-
-    //replace the matched word with highlighting span
-    let highlight = word.replace(word, `<span class="match">` + word + `</span>`)
-
-    //get the content from the beginning to where the first word is
-    let preText = content.substring(0, wordStart[0])
-
-    //get all the content from where the 1st word ends to where the 2nd word begin
-    let midText = []
-    for (let i = 0; i < wordStart.length; i++) {
-        midText.push(content.substring(wordEnd[i], wordStart[i + 1]))
+document.addEventListener('DOMContentLoaded', search.getContent, false);
+document
+    .getElementById("getSearchInput")
+    .onclick = function() {
+        search.getUserInput(event)
+        if (search.userInput === '') {
+            return search.displayInputError()
+        }
+        search.findMatch()
+        if (search.matches.length === 0) {
+            return search.displayMatchError()
+        }
+        search.recordWordStart()
+        search.recordWordEnd()
+        search.highlightWord()
+        search.getPreText()
+        search.getMidText()
+        search.assemblePostText()
+        search.renderText()
     }
-
-    //assemble the highlighted word with the midtext
-    let midCount = 0;
-    let postText = [];
-    while (midCount < wordStart.length) {
-        postText.push(highlight + midText[midCount])
-        midCount++
-    }
-
-    //push everything to the DOM
-    document.getElementsByTagName('article')[0].innerHTML =
-        (preText + postText.join(" "))
-
-}

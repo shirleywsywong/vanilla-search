@@ -19,6 +19,7 @@ document.getElementById("getSearchInput").onclick = function (event) {
 //find the matching word in the content
 const findMatch = (input) => {
     let match = [...content.matchAll(input)]
+    console.log(match)
     checkMatch(match)
 }
 
@@ -69,6 +70,6 @@ function highlightMatch(word, wordStart, wordEnd) {
 
     //push everything to the DOM
     document.getElementsByTagName('article')[0].innerHTML = 
-    (preText + postText.join(" "))
+    (preText + postText.join(""))
 
 }
