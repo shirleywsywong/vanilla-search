@@ -13,14 +13,16 @@ const search = {
         this.userInput = inputRegex
     },
     displayInputError: function() {
-        return document.getElementById("error").innerHTML = (`Please enter a valid search term`)
+        document.getElementById("error").innerHTML = (`Please enter a valid search term`)
+        document.getElementsByTagName('article')[0].innerHTML = this.articleContent
     },
     matches: [],
     findMatch: function() {
         this.matches = [...this.articleContent.matchAll(this.userInput)]
     },
     displayMatchError: function() {
-        return document.getElementById("error").innerHTML = (`Your search did not return any result.`)
+        document.getElementById("error").innerHTML = (`Your search did not return any result.`)
+        document.getElementsByTagName('article')[0].innerHTML = this.articleContent
     },
     wordMatched: [],
     recordWordMatched: function() {
@@ -93,9 +95,10 @@ document
     .getElementById("getSearchInput")
     .onclick = function() {
         search.getUserInput(event)
-        if (search.userInput === '') {
+        if (search.userInput.toString() === '/(?:)/gi') {
             return search.displayInputError()
         }
+        console.log(search.userInput)
         search.findMatch()
         if (search.matches.length === 0) {
             return search.displayMatchError()
